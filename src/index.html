@@ -1,0 +1,68 @@
+<html>
+
+<head>
+    <meta charset="utf-8">
+</head>
+
+<body>
+    <script src="myPromise.js"></script>
+    <script>
+        const p2 = new Promise(function(resolve, reject) {
+            reject(1)
+        })
+        const p5 = new Promise(function(resolve, reject) {
+            resolve(2)
+        })
+        const p = new MyPromise(function(resolve, reject) {
+            setTimeout(() => reject(1), 1000)
+        });
+        const p4 = new MyPromise(function(resolve, reject) {
+            setTimeout(() => resolve(2), 1000)
+        });
+        const p3 = new MyPromise(function(resolve, reject) {
+            reject(1)
+        });
+        const p6 = new MyPromise(function(resolve, reject) {
+            resolve(2)
+        });
+        test(p2, 'promise')
+        test(p5, 'promise')
+
+        // test2(p2, 'promise')
+        // test(p, 'MyPromise')
+        // test(p4, 'MyPromise')
+        test(p3, 'MyPromise')
+        test(p6, 'MyPromise')
+            // test2(p, 'MyPromise')
+            // Promise.resolve(function() {
+            //     console.log(1)
+            // }).then(res => {
+            //     console.log('Promise.resolve', res)
+            // });
+            // MyPromise.resolve(function() {
+            //     console.log(1)
+            // }).then(res => {
+            //     console.log('MyPromise.resolve', res)
+            // });
+
+        function test(p, text) {
+            p.then(res => {
+                console.log(text, res)
+            }, err => {
+                console.log(text, 'reject ' + err)
+            }).then(res => {
+                console.log(text, res)
+            }).finally(() => {
+                console.log(text, 'finally', p)
+            })
+        }
+
+        function test2(p, text) {
+            console.log(text)
+            console.log(p.then())
+            console.log(p.then().then())
+        }
+    </script>
+</body>
+
+</html

@@ -1,0 +1,1 @@
+define({  "name": "promise",  "version": "0.1.0",  "description": "promise",  "title": "promise apiDoc",  "sampleUrl": false,  "defaultVersion": "0.0.0",  "apidoc": "0.3.0",  "generator": {    "name": "apidoc",    "time": "2018-01-26T16:28:18.315Z",    "url": "http://apidocjs.com",    "version": "0.17.6"  }});
