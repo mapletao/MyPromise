@@ -1,5 +1,6 @@
 # promise overwrite
 ## 注册对象
+
 ### 成功对象
 ```  
 const p3 = new MyPromise(function(resolve, reject) {
