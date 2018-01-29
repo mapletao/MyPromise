@@ -40,6 +40,10 @@
     function getErrorText(value) {
         return isPrimitive(value) ? value : _toString.call(value);
     }
+
+    function errorType(val) {
+        return 'Promise resolver ' + getErrorText(val) + ' is not a function'
+    }
     /**
      * @api {overWrite} MyPromise
      * @apiGroup MyPromise
@@ -50,7 +54,7 @@
      */
     function MyPromise(resolver) {
         if (typeof resolver !== 'function') {
-            throw new TypeError('Promise resolver ' + getErrorText(resolver) + ' is not a function');
+            throw new TypeError(errorType(resolver));
             return !1;
         }
         if (!(this instanceof MyPromise)) {
@@ -289,7 +293,46 @@
      * @apiGroup MyPromise
      * @apiName all
      */
-    function _all() {}
+    function _all(vals) {
+        if (!_isArray(vals)) {
+            return reject(errorType('undefined'));
+        }
+        const myPromiseAll = new MyPromise(noop);
+        const result = [];
+        const errorTip = false;
+        const successHandle = () => {
+            if (result.length !== vals.length) {
+                return !1
+            }
+            _resolve(myPromiseAll, result);
+        }
+        const errHandle = msg => {
+            if (errorTip) {
+                return !1
+            }
+            errorTip = true;
+            _reject(myPromiseAll, msg);
+        }
+        for (let i = 0; i < vals.length; i++) {
+            const myPromise = vals[i];
+            if (myPromise instanceof MyPromise) {
+                if (myPromise.status === RESOLVED) {
+                    result[i] = myPromise.value;
+                    successHandle();
+                } else if (myPromise.status === REJECTED) {
+                    errHandle(myPromise.value);
+                } else {
+                    myPromise.then(res => {
+                        result[i] = res;
+                        successHandle();
+                    }, err => {
+                        errHandle(err);
+                    })
+                }
+            }
+        }
+        return myPromiseAll
+    }
     /**
      * @api race
      * @apiGroup MyPromise

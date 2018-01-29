@@ -37,25 +37,35 @@
             })
             // test(p2, 'promise')
             // test(p5, 'promise')
-        test(p7, 'promise p7')
-        test(p8, 'MyPromise p8')
+            // test(p7, 'promise p7')
+            // test(p8, 'MyPromise p8')
+            // test2(p2, 'promise')
+            // test(p, 'MyPromise')
+            // test(p4, 'MyPromise')
+            // test(p3, 'MyPromise')
+            // test(p6, 'MyPromise')
+            // test2(p, 'MyPromise')
+            // Promise.resolve(function() {
+            //     console.log(1)
+            // }).then(res => {
+            //     console.log('Promise.resolve', res)
+            // });
+            // MyPromise.resolve(function() {
+            //     console.log(1)
+            // }).then(res => {
+            //     console.log('MyPromise.resolve', res)
+            // });
+        test3.bind(Promise)('Promise')
+        test3.bind(MyPromise)('MyPromise')
 
-        // test2(p2, 'promise')
-        // test(p, 'MyPromise')
-        // test(p4, 'MyPromise')
-        // test(p3, 'MyPromise')
-        // test(p6, 'MyPromise')
-        // test2(p, 'MyPromise')
-        // Promise.resolve(function() {
-        //     console.log(1)
-        // }).then(res => {
-        //     console.log('Promise.resolve', res)
-        // });
-        // MyPromise.resolve(function() {
-        //     console.log(1)
-        // }).then(res => {
-        //     console.log('MyPromise.resolve', res)
-        // });
+        function test3(str) {
+            this.all([this.resolve(1), this.resolve(2), this.resolve(3)])
+                .then(res => {
+                    console.log(str, res)
+                }).catch(err => {
+                    console.log(str, err)
+                })
+        }
 
         function test(p, text) {
             p.then(res => {
@@ -77,4 +87,4 @@
     </script>
 </body>
 
-</html
+</html>
