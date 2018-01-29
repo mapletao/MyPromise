@@ -7,9 +7,9 @@
 <body>
     <script src="myPromise.js"></script>
     <script>
-        const p2 = new Promise(function(resolve, reject) {
-            reject(1)
-        })
+        // const p2 = new Promise(function(resolve, reject) {
+        //     reject(1)
+        // })
         const p5 = new Promise(function(resolve, reject) {
             resolve(2)
         })
@@ -25,25 +25,37 @@
         const p6 = new MyPromise(function(resolve, reject) {
             resolve(2)
         });
-        test(p2, 'promise')
-        test(p5, 'promise')
+        const p7 = Promise.resolve({
+            then: function(resolve, reject) {
+                resolve('p7')
+            }
+        })
+        const p8 = MyPromise.resolve({
+                then: function(resolve, reject) {
+                    resolve('p8')
+                }
+            })
+            // test(p2, 'promise')
+            // test(p5, 'promise')
+        test(p7, 'promise p7')
+        test(p8, 'MyPromise p8')
 
         // test2(p2, 'promise')
         // test(p, 'MyPromise')
         // test(p4, 'MyPromise')
-        test(p3, 'MyPromise')
-        test(p6, 'MyPromise')
-            // test2(p, 'MyPromise')
-            // Promise.resolve(function() {
-            //     console.log(1)
-            // }).then(res => {
-            //     console.log('Promise.resolve', res)
-            // });
-            // MyPromise.resolve(function() {
-            //     console.log(1)
-            // }).then(res => {
-            //     console.log('MyPromise.resolve', res)
-            // });
+        // test(p3, 'MyPromise')
+        // test(p6, 'MyPromise')
+        // test2(p, 'MyPromise')
+        // Promise.resolve(function() {
+        //     console.log(1)
+        // }).then(res => {
+        //     console.log('Promise.resolve', res)
+        // });
+        // MyPromise.resolve(function() {
+        //     console.log(1)
+        // }).then(res => {
+        //     console.log('MyPromise.resolve', res)
+        // });
 
         function test(p, text) {
             p.then(res => {

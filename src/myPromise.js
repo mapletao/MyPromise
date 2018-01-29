@@ -124,9 +124,9 @@
         if (val instanceof MyPromise) {
             return val;
         }
-        // if (typeof val === 'function') {
-        //     return new MyPromise(val);
-        // }
+        if (val.then && typeof val.then === 'function') {
+            return new MyPromise(val.then)
+        }
         const myPromise = new MyPromise(noop);
         _resolve(myPromise, val);
         return myPromise;
