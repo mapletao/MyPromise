@@ -96,7 +96,7 @@
                     resolve(8)
                 }, 2000);
             }))
-            this.race([this.reject(1), p1, p2, p3])
+            this.race([this.resolve(10), p1, p2, p3])
                 .then(res => {
                     console.log(str, '*resolve*', res)
                 }).catch(err => {

@@ -382,7 +382,7 @@
             }
             completeStatus = true;
             cb(myPromiseRace, msg)
-            initMyPromiseComplete(myPromiseRace, resolve === _resolve ? true : false)
+            nextTick(initMyPromiseComplete.bind(null, myPromiseRace), resolve === _resolve ? true : false)
         }
         if (!_isArray(vals)) {
             completeHandle(errorType('undefined'), _reject);
@@ -392,8 +392,7 @@
             const myPromise = vals[i];
             if (myPromise instanceof MyPromise) {
                 if (myPromise.status === RESOLVED) {
-                    // completeHandle(myPromise.value, _resolve);
-                    nextTick(completeHandle.bind(null, myPromise.value), _resolve);
+                    completeHandle(myPromise.value, _resolve);
                     break;
                 } else if (myPromise.status === REJECTED) {
                     completeHandle(myPromise.value, _reject);
@@ -406,7 +405,7 @@
                     })
                 }
             } else {
-                nextTick(completeHandle.bind(null, myPromise.value), _resolve);
+                completeHandle(myPromise, _resolve);
                 break
             }
         }
