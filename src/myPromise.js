@@ -45,7 +45,7 @@
     }
 
     function errorType(val) {
-        return 'Promise resolver ' + getErrorText(val) + ' is not a function'
+        return 'MyPromise resolver ' + getErrorText(val) + ' is not a function'
     }
     /**
      * @api {overWrite} MyPromise
@@ -322,9 +322,6 @@
      * @apiName all
      */
     function _all(vals) {
-        if (!_isArray(vals)) {
-            return reject(errorType('undefined'));
-        }
         const myPromiseAll = new MyPromise(noop);
         const result = [];
         let errorTip = false;
@@ -342,6 +339,10 @@
             errorTip = true;
             _reject(myPromiseAll, msg);
             initMyPromiseComplete(myPromiseAll, false)
+        }
+        if (!_isArray(vals)) {
+            errHandle(errorType('undefined'));
+            return myPromiseAll;
         }
         for (let i = 0; i < vals.length; i++) {
             const myPromise = vals[i];
@@ -371,7 +372,30 @@
      * @apiGroup MyPromise
      * @apiName race
      */
-    function _race() {}
+    function _race(vals) {
+        const myPromiseRace = new MyPromise(noop);
+        const result = [];
+        let errorTip = false;
+        const successHandle = () => {
+            if (result.length !== vals.length) {
+                return !1
+            }
+            _resolve(myPromiseRace, result);
+            initMyPromiseComplete(myPromiseRace, true)
+        }
+        const errHandle = msg => {
+            if (errorTip) {
+                return !1
+            }
+            errorTip = true;
+            _reject(myPromiseRace, msg);
+            initMyPromiseComplete(myPromiseRace, false)
+        }
+        if (!_isArray(vals)) {
+            errHandle(errorType('undefined'));
+            return myPromiseRace;
+        }
+    }
     /**
      * @api done
      * @apiGroup MyPromise
