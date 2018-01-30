@@ -55,11 +55,20 @@
             // }).then(res => {
             //     console.log('MyPromise.resolve', res)
             // });
-        test3.bind(Promise)('Promise')
-        test3.bind(MyPromise)('MyPromise')
+        testPromiseAll.bind(Promise)('Promise')
+        testPromiseAll.bind(MyPromise)('MyPromise')
 
-        function test3(str) {
+        function testPromiseAll(str) {
             this.all([this.resolve(1), this.resolve(2), this.resolve(3)])
+                .then(res => {
+                    console.log(str, res)
+                }).catch(err => {
+                    console.log(str, err)
+                })
+        }
+
+        function testRace(str) {
+            this.race(this.resolve(1))
                 .then(res => {
                     console.log(str, res)
                 }).catch(err => {
