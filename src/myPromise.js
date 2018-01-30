@@ -105,8 +105,21 @@
     function initParentPromise(myPromise, resolve) {
         return function(resolve, myPromise, val) {
             resolve.bind(null, myPromise)(val)
-            runThen(myPromise, resolve === _resolve ? true : false)
+            initMyPromiseComplete(myPromise, resolve === _resolve ? true : false)
         }.bind(null, resolve, myPromise)
+    }
+    /**
+     * 
+     * @apiParam {MyPromise} myPromise MyPromise 对象
+     * @apiParam {boolean} temp 拒绝或成功状态
+     * @api firstMyPromiseComplete MyPromise原始对象执行完成
+     * @apiDescription MyPromise原始（初始）（执行链的第一个）对象执行完成调用
+     * @apiGroup MyPromise
+     * @apiName initMyPromiseComplete
+     * 
+     */
+    function initMyPromiseComplete(myPromise, temp) {
+        nextTick(runThen.bind(null, myPromise), temp)
     }
     /**
      * 
@@ -320,7 +333,7 @@
                 return !1
             }
             _resolve(myPromiseAll, result);
-            nextTick(runThen.bind(null, myPromiseAll), true)
+            initMyPromiseComplete(myPromiseAll, true)
         }
         const errHandle = msg => {
             if (errorTip) {
@@ -328,7 +341,7 @@
             }
             errorTip = true;
             _reject(myPromiseAll, msg);
-            nextTick(runThen.bind(null, myPromiseAll), false)
+            initMyPromiseComplete(myPromiseAll, false)
         }
         for (let i = 0; i < vals.length; i++) {
             const myPromise = vals[i];
