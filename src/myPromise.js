@@ -1,3 +1,4 @@
+;
 (function(win) {
 
     const _toString = Object.prototype.toString;
@@ -7,6 +8,8 @@
     const RESOLVED = 'resolved';
     const REJECTED = 'rejected';
     let cid = 0
+    const myPromises = []
+
 
     /**
      * 
@@ -163,9 +166,6 @@
         if (val instanceof MyPromise) {
             return val;
         }
-        if (typeof val === 'function') {
-            return new MyPromise(val);
-        }
         const myPromise = new MyPromise(noop);
         _reject(myPromise, val);
         return myPromise;
@@ -185,7 +185,6 @@
         myPromise.value = val;
     }
 
-    const myPromises = []
 
     /**
      * @api then then方法处理
@@ -225,11 +224,27 @@
     function runThen(myPromise, temp) {
         const currentMyPromise = getCurrentMyPromise(myPromise.cid);
         removeCurrentMyPromise(myPromise)
+        const rejectPromise = getRejectFun(currentMyPromise)
         currentMyPromise &&
             temp ? (typeof currentMyPromise.resolveFun) === 'function' &&
             nextTick(resolveNextTick(currentMyPromise.resolveFun, currentMyPromise), myPromise.value) :
-            (typeof currentMyPromise.rejectFun) === 'function' &&
-            nextTick(rejectNextTick(currentMyPromise.rejectFun, currentMyPromise), myPromise.value);
+            rejectPromise &&
+            nextTick(rejectNextTick(rejectPromise.rejectFun, rejectPromise), myPromise.value);
+    }
+    /**
+     * @api getRejectFun 获取拒绝执行函数
+     * @param {MyPromise} myPromise 
+     * @apiName getRejectFun
+     * @apiGroup MyPromise
+     */
+    function getRejectFun(myPromise) {
+        if (!myPromise) {
+            return !1
+        }
+        if ((typeof myPromise.rejectFun) === 'function') {
+            return myPromise
+        }
+        return getRejectFun(getCurrentMyPromise(myPromise.cid))
     }
     /**
      * 
@@ -270,7 +285,7 @@
     function resolveNextTick(resolve, myPromise) {
         return function(resolve, myPromise, val) {
             resolve(val);
-            runThen(myPromise, true)
+            runThen(myPromise, true);
         }.bind(null, resolve, myPromise)
     }
     /**
@@ -285,7 +300,7 @@
     function rejectNextTick(reject, myPromise) {
         return function(reject, myPromise, val) {
             reject(val);
-            runThen(myPromise, true)
+            runThen(myPromise, true);
         }.bind(null, reject, myPromise)
     }
     /**
@@ -299,12 +314,13 @@
         }
         const myPromiseAll = new MyPromise(noop);
         const result = [];
-        const errorTip = false;
+        let errorTip = false;
         const successHandle = () => {
             if (result.length !== vals.length) {
                 return !1
             }
             _resolve(myPromiseAll, result);
+            nextTick(runThen.bind(null, myPromiseAll), true)
         }
         const errHandle = msg => {
             if (errorTip) {
@@ -312,6 +328,7 @@
             }
             errorTip = true;
             _reject(myPromiseAll, msg);
+            nextTick(runThen.bind(null, myPromiseAll), false)
         }
         for (let i = 0; i < vals.length; i++) {
             const myPromise = vals[i];
@@ -329,6 +346,9 @@
                         errHandle(err);
                     })
                 }
+            } else {
+                result[i] = myPromise;
+                successHandle();
             }
         }
         return myPromiseAll
