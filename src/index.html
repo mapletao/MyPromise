@@ -10,56 +10,61 @@
         // const p2 = new Promise(function(resolve, reject) {
         //     reject(1)
         // })
-        const p5 = new Promise(function(resolve, reject) {
-            resolve(2)
-        })
-        const p = new MyPromise(function(resolve, reject) {
-            setTimeout(() => reject(1), 1000)
-        });
-        const p4 = new MyPromise(function(resolve, reject) {
-            setTimeout(() => resolve(2), 1000)
-        });
-        const p3 = new MyPromise(function(resolve, reject) {
-            reject(1)
-        });
-        const p6 = new MyPromise(function(resolve, reject) {
-            resolve(2)
-        });
-        const p7 = Promise.resolve({
-            then: function(resolve, reject) {
-                resolve('p7')
-            }
-        })
-        const p8 = MyPromise.resolve({
-                then: function(resolve, reject) {
-                    resolve('p8')
-                }
-            })
-            // test(p2, 'promise')
-            // test(p5, 'promise')
-            // test(p7, 'promise p7')
-            // test(p8, 'MyPromise p8')
-            // test2(p2, 'promise')
-            // test(p, 'MyPromise')
-            // test(p4, 'MyPromise')
-            // test(p3, 'MyPromise')
-            // test(p6, 'MyPromise')
-            // test2(p, 'MyPromise')
-            // Promise.resolve(function() {
-            //     console.log(1)
-            // }).then(res => {
-            //     console.log('Promise.resolve', res)
-            // });
-            // MyPromise.resolve(function() {
-            //     console.log(1)
-            // }).then(res => {
-            //     console.log('MyPromise.resolve', res)
-            // });
-        testPromiseAll.bind(Promise)('Promise')
-        testPromiseAll.bind(MyPromise)('MyPromise')
+        // const p5 = new Promise(function(resolve, reject) {
+        //     resolve(2)
+        // })
+        // const p = new MyPromise(function(resolve, reject) {
+        //     setTimeout(() => reject(1), 1000)
+        // });
+        // const p4 = new MyPromise(function(resolve, reject) {
+        //     setTimeout(() => resolve(2), 1000)
+        // });
+        // const p3 = new MyPromise(function(resolve, reject) {
+        //     reject(1)
+        // });
+        // const p6 = new MyPromise(function(resolve, reject) {
+        //     resolve(2)
+        // });
+        // const p7 = Promise.resolve({
+        //     then: function(resolve, reject) {
+        //         resolve('p7')
+        //     }
+        // })
+        // const p8 = MyPromise.resolve({
+        //         then: function(resolve, reject) {
+        //             resolve('p8')
+        //         }
+        //     })
+        // test(p2, 'promise')
+        // test(p5, 'promise')
+        // test(p7, 'promise p7')
+        // test(p8, 'MyPromise p8')
+        // test2(p2, 'promise')
+        // test(p, 'MyPromise')
+        // test(p4, 'MyPromise')
+        // test(p3, 'MyPromise')
+        // test(p6, 'MyPromise')
+        // test2(p, 'MyPromise')
+        // Promise.resolve(function() {
+        //     console.log(1)
+        // }).then(res => {
+        //     console.log('Promise.resolve', res)
+        // });
+        // MyPromise.resolve(function() {
+        //     console.log(1)
+        // }).then(res => {
+        //     console.log('MyPromise.resolve', res)
+        // });
+        // testPromiseAll.bind(Promise)('Promise')
+        // testPromiseAll.bind(MyPromise)('MyPromise')
 
         function testPromiseAll(str) {
-            this.all([this.resolve(1), this.resolve(2), this.resolve(3)])
+            const p2 = this.resolve(new this(function(resolve) {
+                setTimeout(() => {
+                    resolve(6)
+                }, 1000);
+            }))
+            this.all([this.resolve(1), this.resolve(2), this.resolve(3), p2])
                 .then(res => {
                     console.log(str, res)
                 }).catch(err => {
@@ -67,12 +72,35 @@
                 })
         }
 
+        testRace.bind(Promise)('Promise')
+        testRace.bind(MyPromise)('MyPromise')
+
         function testRace(str) {
-            this.race(this.resolve(1))
+            const p1 = this.resolve(new this(function(resolve, reject) {
+                setTimeout(() => {
+                    resolve(1)
+                }, 100);
+            }))
+            const p2 = this.resolve(new this(function(resolve, reject) {
+                setTimeout(() => {
+                    resolve(6)
+                }, 1000);
+            }))
+            const p3 = this.resolve(new this(function(resolve, reject) {
+                setTimeout(() => {
+                    resolve(7)
+                }, 1500);
+            }))
+            const p4 = this.resolve(new this(function(resolve, reject) {
+                setTimeout(() => {
+                    resolve(8)
+                }, 2000);
+            }))
+            this.race([this.reject(1), p1, p2, p3])
                 .then(res => {
-                    console.log(str, res)
+                    console.log(str, '*resolve*', res)
                 }).catch(err => {
-                    console.log(str, err)
+                    console.log(str, '*reject*', err)
                 })
         }
 

@@ -352,6 +352,7 @@
                     successHandle();
                 } else if (myPromise.status === REJECTED) {
                     errHandle(myPromise.value);
+                    break;
                 } else {
                     myPromise.then(res => {
                         result[i] = res;
@@ -374,27 +375,42 @@
      */
     function _race(vals) {
         const myPromiseRace = new MyPromise(noop);
-        const result = [];
-        let errorTip = false;
-        const successHandle = () => {
-            if (result.length !== vals.length) {
+        let completeStatus = false;
+        const completeHandle = (msg, cb) => {
+            if (completeStatus) {
                 return !1
             }
-            _resolve(myPromiseRace, result);
-            initMyPromiseComplete(myPromiseRace, true)
-        }
-        const errHandle = msg => {
-            if (errorTip) {
-                return !1
-            }
-            errorTip = true;
-            _reject(myPromiseRace, msg);
-            initMyPromiseComplete(myPromiseRace, false)
+            completeStatus = true;
+            cb(myPromiseRace, msg)
+            initMyPromiseComplete(myPromiseRace, resolve === _resolve ? true : false)
         }
         if (!_isArray(vals)) {
-            errHandle(errorType('undefined'));
+            completeHandle(errorType('undefined'), _reject);
             return myPromiseRace;
         }
+        for (let i = 0; i < vals.length; i++) {
+            const myPromise = vals[i];
+            if (myPromise instanceof MyPromise) {
+                if (myPromise.status === RESOLVED) {
+                    // completeHandle(myPromise.value, _resolve);
+                    nextTick(completeHandle.bind(null, myPromise.value), _resolve);
+                    break;
+                } else if (myPromise.status === REJECTED) {
+                    completeHandle(myPromise.value, _reject);
+                    break;
+                } else {
+                    myPromise.then(res => {
+                        completeHandle(res, _resolve);
+                    }, err => {
+                        completeHandle(err, _reject);
+                    })
+                }
+            } else {
+                nextTick(completeHandle.bind(null, myPromise.value), _resolve);
+                break
+            }
+        }
+        return myPromiseRace;
     }
     /**
      * @api done
